@@ -14,4 +14,8 @@ Gem::Specification.new do |gem|
   gem.name          = "mana"
   gem.require_paths = ["lib"]
   gem.version       = Mana::VERSION
+
+  gem.add_dependency "capistrano"
+  gem.add_dependency "roundsman"
+  gem.add_dependency "capistrano_colors"
 end
