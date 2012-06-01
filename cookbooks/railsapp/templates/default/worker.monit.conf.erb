@@ -1,0 +1,8 @@
+check process <%= node[:application] -%>-web-worker-<%= @nr -%>
+  with pidfile <%= node[:shared_path] -%>/pids/unicorn.<%= @nr -%>.pid
+  start program = "/bin/true"
+  stop program = "/bin/sh -c 'kill `cat <%= node[:shared_path] -%>/pids/unicorn.<%= @nr -%>.pid`'"
+  if mem is greater than 200.0 MB for 1 cycles then restart
+  if cpu is greater than 25% for 2 cycles then alert
+  if cpu is greater than 50% for 5 cycles then restart
+  group <%= node[:application] -%>-web

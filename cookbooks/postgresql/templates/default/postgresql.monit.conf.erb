@@ -1,0 +1,11 @@
+# managed by chef, changes will be overwritten
+check process postgresql with pidfile /var/run/postgresql/<%= node.postgresql.version -%>-main.pid
+  start program "/etc/init.d/postgresql start"
+  stop  program "/etc/init.d/postgresql stop"
+  if failed unixsocket /var/run/postgresql/.s.PGSQL.5432 protocol pgsql then alert
+  if failed unixsocket /var/run/postgresql/.s.PGSQL.5432 protocol pgsql then restart
+  <% if node.postgresql.listen_all -%>
+  if failed host localhost port 5432 protocol pgsql then alert
+  if failed host localhost port 5432 protocol pgsql then restart
+  <% end -%>
+  if 5 restarts within 5 cycles then timeout

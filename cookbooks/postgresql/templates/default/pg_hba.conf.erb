@@ -1,0 +1,4 @@
+local all all           trust
+<% if node.postgresql.listen_all -%>
+host  all all 0.0.0.0/0 trust
+<% end -%>

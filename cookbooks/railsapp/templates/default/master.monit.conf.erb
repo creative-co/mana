@@ -1,0 +1,8 @@
+check process <%= node[:application] -%>-web
+  with pidfile <%= node[:shared_path] -%>/pids/unicorn.pid
+  start program = "/etc/init.d/<%= node[:application] -%>-web start"
+  stop program = "/etc/init.d/<%= node[:application] -%>-web stop"
+  if mem is greater than 300.0 MB for 1 cycles then restart
+  if cpu is greater than 50% for 2 cycles then alert
+  if cpu is greater than 80% for 3 cycles then restart
+  group <%= node[:application] -%>-web

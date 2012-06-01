@@ -1,0 +1,37 @@
+worker_processes <%= node[:railsapp][:worker_processes] %>
+
+timeout <%= node[:railsapp][:request_timeout] %>
+
+user '<%= node[:railsapp][:worker_user] %>',
+     '<%= node[:railsapp][:worker_group] %>'
+
+listen "<%= node[:shared_path] %>/sockets/unicorn.sock"
+pid "<%= node[:shared_path] %>/pids/unicorn.pid"
+
+working_directory File.readlink("<%= node[:current_path] %>")
+
+stderr_path "<%= node[:shared_path] %>/log/unicorn.log"
+stdout_path "<%= node[:shared_path] %>/log/unicorn.log"
+
+preload_app true
+GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
+
+before_fork do |server, worker|
+  old_pid = "#{server.config[:pid]}.oldbin"
+  if File.exists?(old_pid) && server.pid != old_pid
+    begin
+      Process.kill(:QUIT, File.read(old_pid).to_i)
+    rescue Errno::ENOENT, Errno::ESRCH
+      # someone else did our job for us
+    end
+  end
+  # Application-specific
+  <%= node[:railsapp][:before_fork] %>
+end
+
+after_fork do |server, worker|
+  child_pid = server.config[:pid].sub('.pid', ".#{worker.nr}.pid")
+  system("echo #{Process.pid} > #{child_pid}")
+  # Application-specific
+  <%= node[:railsapp][:after_fork] %>
+end

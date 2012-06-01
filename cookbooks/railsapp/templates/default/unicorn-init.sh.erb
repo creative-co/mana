@@ -1,0 +1,64 @@
+#!/bin/sh
+
+set -e
+
+<%
+cmd = <<-SHELL
+    cd #{node[:current_path]}
+    /usr/bin/env RAILS_ENV=#{node[:rails_env]} bundle exec unicorn -D -c #{node[:shared_path]}/unicorn.rb
+SHELL
+pid = "#{node[:shared_path]}/pids/unicorn.pid"
+old_pid = "#{pid}.oldbin"
+%>
+
+PATH=/usr/local/sbin:/usr/local/bin:$PATH
+
+action="$1"
+
+set -u
+
+sig () {
+	test -s "<%= pid %>" && kill -$1 `cat <%= pid %>`
+}
+
+case $action in
+start)
+	sig 0 && echo >&2 "Already running" && exit 0
+	<%= cmd %>
+	;;
+stop)
+	sig QUIT && exit 0
+	echo >&2 "Not running"
+	;;
+force-stop)
+	sig TERM && exit 0
+	echo >&2 "Not running"
+	;;
+restart|reload)
+	if sig USR2 && sleep 5 && sig 0
+	then
+		n=60
+		while test -s <%= old_pid %> && test $n -ge 0
+		do
+			printf '.' && sleep 1 && n=$(( $n - 1 ))
+		done
+		echo
+
+		if test $n -lt 0 && test -s <%= old_pid %>
+		then
+			echo >&2 "Old process still exists after 60 seconds"
+			exit 1
+		fi
+		exit 0
+	fi
+	echo >&2 "Couldn't reload, starting '<%= cmd %>' instead"
+	<%= cmd %>
+	;;
+reopen-logs)
+	sig USR1
+	;;
+*)
+	echo >&2 "Usage: $0 <start|stop|restart|force-stop|reopen-logs>"
+	exit 1
+	;;
+esac
