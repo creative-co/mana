@@ -1,0 +1,8 @@
+load 'deploy'
+
+load 'deploy/assets'
+require 'bundler/capistrano'
+
+require 'mana/capistrano'
+
+load 'config/deploy'

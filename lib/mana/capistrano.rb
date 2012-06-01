@@ -2,6 +2,12 @@ require 'roundsman/capistrano'
 require 'capistrano_colors'
 require 'capistrano/ext/multistage'
 
+Capistrano::Configuration.default_io_proc = ->(ch, stream, out){
+  next if out.strip.empty?
+  level = stream == :err ? :important : :info
+  ch[:options][:logger].send(level, out.strip, "#{stream} :: #{ch[:server]}")
+}
+
 Capistrano::Configuration.instance(:must_exist).load do
   
   # Convinient defaults
