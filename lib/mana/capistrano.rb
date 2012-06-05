@@ -81,6 +81,12 @@ Capistrano::Configuration.instance(:must_exist).load do
       sudo "#{fetch(:package_manager)} -yq update"
       sudo "#{fetch(:package_manager)} -yq upgrade"
     end
+    
+    desc "Open SSH connection to server"
+    task :ssh do
+      host = roles[:app].servers.first # silly approach
+      exec "ssh -L 3737:localhost:3737 #{fetch(:user)}@#{host}" # forward monit status server port
+    end
   end
   
   # More convinience

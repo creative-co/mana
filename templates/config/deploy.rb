@@ -20,5 +20,4 @@ set :run_list, %w(
   recipe[railsapp]
 )
   
-after 'deploy', 'deploy:restart_unicorn'
-after 'deploy:restart', 'deploy:cleanup'
+after 'deploy:restart', 'deploy:restart_unicorn'
