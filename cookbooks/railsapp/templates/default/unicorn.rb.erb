@@ -16,6 +16,10 @@ stdout_path "<%= node[:shared_path] %>/log/unicorn.log"
 preload_app true
 GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
 
+before_exec do |server|
+    ENV['BUNDLE_GEMFILE'] = '<%= node[:current_path] %>/Gemfile'
+end
+
 before_fork do |server, worker|
   old_pid = "#{server.config[:pid]}.oldbin"
   if File.exists?(old_pid) && server.pid != old_pid
