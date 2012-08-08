@@ -4,7 +4,7 @@ set :repository, 'git@github.com:author/application.git' #TODO: change this to r
 
 set :default_stage, :vagrant
 
-set :ruby_version, '1.9.3-p194'
+set :care_about_ruby_version, false
 
 set :postgresql, version: '9.1'
 

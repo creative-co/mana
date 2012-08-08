@@ -22,25 +22,21 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   # Roundsman fine-tuning
 
-  set :chef_version, '0.10.10'
+  set :chef_version, '10.12.0'
   set :cookbooks_directory, 'config/deploy/cookbooks'
   set :stream_roundsman_output, false
-  set :ruby_install_script do
-    %Q{
-        set -e
-        cd #{roundsman_working_dir}
-        rm -rf ruby-build
-        git clone -q git://github.com/sstephenson/ruby-build.git
-        cd ruby-build
-        ./install.sh
-        CONFIGURE_OPTS='--disable-install-rdoc' ruby-build #{fetch(:ruby_version)} #{fetch(:ruby_install_dir)}
-    }
-  end
+  set :ruby_install_script do %Q{
+    apt-get install -y python-software-properties
+    apt-add-repository -y ppa:brightbox/ruby-ng
+    apt-get update
+    apt-get install -y ruby1.9.3
+    gem install bundler
+  } end
   
   # Mana
   
   namespace :mana do
-    desc 'Complete setup of all software'
+    desc 'Complete update of all software'
     task :default do
       if roundsman.install.install_ruby?
         abort "Node is not boostrapped yet. Please run 'cap mana:setup' instead"
@@ -78,8 +74,8 @@ Capistrano::Configuration.instance(:must_exist).load do
     
     desc 'Upgrade software'
     task :upgrade do
-      sudo "#{fetch(:package_manager)} -yq update"
-      sudo "#{fetch(:package_manager)} -yq upgrade"
+      sudo "DEBIAN_FRONTEND=noninteractive #{fetch(:package_manager)} -yq update"
+      sudo "DEBIAN_FRONTEND=noninteractive #{fetch(:package_manager)} -yq upgrade"
     end
     
     desc "Open SSH connection to server"
@@ -94,7 +90,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   namespace :deploy do
     desc 'Update the database with seed data'
     task :seed, roles: :db, only: {primary: true} do
-      run "cd #{current_path}; rake db:seed RAILS_ENV=#{rails_env}"
+      run "cd #{current_path}; bundle exec rake db:seed RAILS_ENV=#{rails_env}"
     end
     
     desc "Restart unicorn"
