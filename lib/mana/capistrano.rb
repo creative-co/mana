@@ -83,6 +83,18 @@ Capistrano::Configuration.instance(:must_exist).load do
       host = roles[:app].servers.first # silly approach
       exec "ssh -L 3737:localhost:3737 #{fetch(:user)}@#{host}" # forward monit status server port
     end
+    
+    desc "Watch Rails log"
+    task :watchlog do
+      begin
+        run "tail -n 100 -f #{fetch(:shared_path)}/log/#{rails_env}.log", pty: true do |_, stream, data|
+          puts "[#{channel[:host]}][#{Time.now.strftime('%Y-%m-%d %H:%M:%S')}] #{data}"
+          break if stream == :err
+        end
+      rescue Interrupt
+        exit
+      end
+    end
   end
   
   # More convinience
