@@ -4,6 +4,8 @@ Configuration management with Chef & Capistrano
 
 ## Installation
 
+### Step 1
+
 Add this line to your application's Gemfile:
 
     gem 'mana'
@@ -16,9 +18,31 @@ Or install it yourself as:
 
     $ gem install mana
 
-## Usage
+### Step 2
+
+Init project with Chef, Capistrano and Vagrant configs:
 
     rake mana:install
+
+Edit `config/deploy.rb` to provide application name, SCM repository etc. and Chef cookbook params.
+
+Edit `Vagrantfile` to match your available Vagrant boxes and personal taste.
+
+Edit Chef cookbooks under `config/deploy/cookbooks` directory to add software.
+
+## Usage
+
+Setup all software on server:
+
+    cap <stage> mana:setup
+
+where `<stage>` is server name. Individual stages can be added in `config/deploy/` directory.
+See default `vagrant` stage for details.
+
+Use ordinary `cap deploy`-like stuff for later deploys and `cap mana:install` for configuration upgrades.
+
+Use `cap -T mana` to see useful stuff added after this.
+
 
 ## Contributing
 
