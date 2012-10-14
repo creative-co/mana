@@ -24,7 +24,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   set :chef_version, '10.12.0'
   set :cookbooks_directory, 'config/deploy/cookbooks'
-  set :stream_roundsman_output, false
+  set :stream_roundsman_output, false # todo check why is this needed
   set :ruby_install_script do %Q{
     apt-get install -y python-software-properties
     apt-add-repository -y ppa:brightbox/ruby-ng
