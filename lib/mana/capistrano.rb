@@ -24,13 +24,27 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :chef_version, '10.12.0'
   set :cookbooks_directory, 'config/deploy/cookbooks'
   set :stream_roundsman_output, false # todo check why is this needed
-  set :ruby_install_script do %Q{
-    apt-get install -y python-software-properties
-    apt-add-repository -y ppa:brightbox/ruby-ng
-    apt-get update
-    apt-get install -y ruby1.9.3
-    gem install bundler
-  } end
+  set :ruby_install_script do
+    if fetch(:ruby_version) == :brightbox
+      %Q{
+        apt-get install -y python-software-properties
+        apt-add-repository -y ppa:brightbox/ruby-ng
+        apt-get update
+        apt-get install -y ruby1.9.3
+        gem install bundler
+      }
+    else
+      %Q{
+        set -e
+        cd #{roundsman_working_dir}
+        rm -rf ruby-build
+        git clone -q https://github.com/sstephenson/ruby-build.git
+        cd ruby-build
+        ./install.sh
+        CONFIGURE_OPTS='--disable-install-rdoc' ruby-build #{fetch(:ruby_version)} #{fetch(:ruby_install_dir)}
+      }
+    end
+  end
   
   # Mana
   
