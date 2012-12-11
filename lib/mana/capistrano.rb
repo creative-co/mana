@@ -1,8 +1,10 @@
 require 'roundsman/capistrano'
 require 'capistrano/ext/multistage'
+require 'capistrano/recipes/deploy/strategy/remote_cache'
+require 'mana/remote_cache_subdir'
 
 Capistrano::Configuration.default_io_proc = ->(ch, stream, out){
-  next if out.strip.empty?
+  next if out.strip.empty? # skipping extensive blank lines
   level = stream == :err ? :important : :info
   ch[:options][:logger].send(level, out.strip, "#{stream} :: #{ch[:server]}")
 }
@@ -18,6 +20,8 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   default_run_options[:pty] = true
   ssh_options[:forward_agent] = true
+  
+  set :strategy, RemoteCacheSubdir.new(self)
   
   # Roundsman fine-tuning
 

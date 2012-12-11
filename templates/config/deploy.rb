@@ -1,6 +1,10 @@
-set :application, 'application' #TODO: change this to application name
+#TODO: change this to application name
+set :application, 'application'
 
-set :repository, 'git@github.com:author/application.git' #TODO: change this to repository
+#TODO: change this to repository
+set :repository, 'git@github.com:author/application.git'
+
+# set :deploy_subdir, ''
 
 set :default_stage, :vagrant
 
@@ -14,8 +18,9 @@ set :care_about_ruby_version, false
 
 set :postgresql, version: '9.1'
 
+#TODO: change this to your email to receive monit alerts
 set :monit,
-    notify_email: 'admin@application.com', #TODO: change this to your email to receive monit alerts
+    notify_email: 'admin@application.com',
     poll_period: 30
 
 set :run_list, %w(
