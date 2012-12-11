@@ -16,12 +16,19 @@ set :default_stage, :vagrant
 set :ruby_version, :brightbox
 set :care_about_ruby_version, false
 
-set :postgresql, version: '9.1'
+set :postgresql,
+    version: '9.1',
+    listen_all: false #TODO: changes this to `true` for TCP connectivity
 
-#TODO: change this to your email to receive monit alerts
 set :monit,
-    notify_email: 'admin@application.com',
+    notify_email: 'admin@application.com', #TODO: change this to your email to receive monit alerts
     poll_period: 30
+
+set :railsapp,
+    server_names: '_' #TODO: change this to domain name(s) of the project
+
+# For other options look into cookbooks/*/attributes/default.rb
+# and other cookbook sources.
 
 set :run_list, %w(
   recipe[monit]
