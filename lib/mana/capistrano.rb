@@ -1,5 +1,4 @@
 require 'roundsman/capistrano'
-require 'capistrano_colors'
 require 'capistrano/ext/multistage'
 
 Capistrano::Configuration.default_io_proc = ->(ch, stream, out){

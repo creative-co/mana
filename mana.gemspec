@@ -17,5 +17,4 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency "capistrano"
   gem.add_dependency "roundsman"
-  gem.add_dependency "capistrano_colors"
 end
