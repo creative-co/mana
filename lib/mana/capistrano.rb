@@ -50,6 +50,32 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
   end
 
+  namespace :roundsman do
+    def install_ruby?
+      installed_version = capture("ruby --version || true").strip
+      if installed_version.include?("not found")
+        logger.info "No version of Ruby could be found."
+        return true
+      end
+
+      return false if fetch(:ruby_version) == :brightbox
+
+      required_version = fetch(:ruby_version).gsub("-", "")
+      if installed_version.include?(required_version)
+        if fetch(:care_about_ruby_version)
+          logger.info "Ruby #{installed_version} matches the required version: #{required_version}."
+          return false
+        else
+          logger.info "Already installed Ruby #{installed_version}, not #{required_version}. Set :care_about_ruby_version if you want to fix this."
+          return false
+        end
+      else
+        logger.info "Ruby version mismatch. Installed version: #{installed_version}, required is #{required_version}"
+        return true
+      end
+    end
+  end
+
   # Mana
 
   namespace :mana do
