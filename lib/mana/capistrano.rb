@@ -25,7 +25,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   # Roundsman fine-tuning
 
-  set :chef_version, '~> 10.18.2'
+  set :chef_version, '~> 11.4.0'
   set :cookbooks_directory, 'config/deploy/cookbooks'
   set :stream_roundsman_output, false # todo check why is this needed
   set :ruby_install_script do
