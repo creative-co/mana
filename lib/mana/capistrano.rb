@@ -97,6 +97,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc 'Install & update software'
     task :install do
       roundsman.chef.default
+      variables.keys.each { |k| reset! k.to_sym }
     end
 
     desc 'Show install log'
