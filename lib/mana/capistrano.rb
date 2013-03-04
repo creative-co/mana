@@ -131,6 +131,25 @@ Capistrano::Configuration.instance(:must_exist).load do
       host = roles[:app].servers.first # silly approach
       exec "ssh #{ssh_login_options} #{fetch(:user)}@#{host}"
     end
+    
+    def sudo_runner
+     (exists? :runner) ? (sudo as: runner) : ''
+    end
+
+    desc 'Run rails console'
+    task :console do
+      host = roles[:app].servers.first # silly approach
+      cmd = "cd #{current_path} && #{sudo_runner} bundle exec rails console #{rails_env}"
+      exec "ssh -t #{ssh_login_options} #{fetch(:user)}@#{host} #{cmd.shellescape}"
+    end
+
+    desc 'Run rake task. Example: cap mana:rake about'
+    task :rake do
+      host = roles[:app].servers.first # silly approach
+      args = ARGV.drop_while { |a| a != 'mana:rake' }[1..-1].join ' '
+      cmd = "cd #{current_path} && #{sudo_runner} RAILS_ENV=#{rails_env} bundle exec rake #{args}"
+      exec "ssh #{fetch(:user)}@#{host} #{cmd.shellescape}"
+    end
 
     desc "Watch Rails log"
     task :watchlog do
@@ -143,6 +162,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         exit
       end
     end
+
   end
 
   # More convinience
