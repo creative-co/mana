@@ -97,7 +97,9 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc 'Install & update software'
     task :install do
       roundsman.chef.default
-      variables.keys.each { |k| reset! k.to_sym }
+
+      # fix https://github.com/iain/roundsman/issues/26
+      variables.keys.each { |k| reset! k }
     end
 
     desc 'Show install log'
@@ -122,10 +124,12 @@ Capistrano::Configuration.instance(:must_exist).load do
       sudo "DEBIAN_FRONTEND=noninteractive #{fetch(:package_manager)} -yq upgrade"
     end
 
+    set :ssh_login_options, '-L 3737:localhost:3737' # forward monit status server port
+
     desc "Open SSH connection to server"
     task :ssh do
       host = roles[:app].servers.first # silly approach
-      exec "ssh -L 3737:localhost:3737 #{fetch(:user)}@#{host}" # forward monit status server port
+      exec "ssh #{ssh_login_options} #{fetch(:user)}@#{host}"
     end
 
     desc "Watch Rails log"
