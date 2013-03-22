@@ -10,11 +10,15 @@ secret_key = #{node.aws.secret_access_key}
 CONTENT
 end
 
-execute "s3cmd -c #{s3cfg_filepath} mb s3://#{node.application}-#{node.stage}"
+bucket = "#{node.application}-backup"
+
+execute "s3cmd -c #{s3cfg_filepath} mb s3://#{bucket}"
  
 cron "#{node.application}-backup" do
-  minute 0
-  command "F=`mktemp` && pg_dump -c -U postgres #{node.railsapp.db_name} | gzip > $F && s3cmd -c #{s3cfg_filepath} put $F s3://#{node.application}-#{node.stage}/backups/`date -u +\\%Y-\\%m-\\%d/\\%H-\\%M-\\%S`.gz && rm $F"
+  server_id = node[:ec2] ? node.ec2.instance_id : node.hostname
 
-  user node.runner || node.user
+  minute 0
+  command "F=`mktemp` && pg_dump -c -U postgres #{node.railsapp.db_name} | gzip > $F && s3cmd -c #{s3cfg_filepath} put $F s3://#{bucket}/#{server_id}-#{node.railsapp.db_name}/`date -u +\\%Y-\\%m-\\%d/\\%H-\\%M-\\%S`.sql.gz && rm $F"
+
+  user node[:runner] || node.user
 end

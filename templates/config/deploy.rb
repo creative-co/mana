@@ -27,6 +27,10 @@ set :monit,
 set :railsapp,
     server_names: '_' #TODO: change this to domain name(s) of the project
 
+set :aws,
+    access_key_id: '',
+    secret_access_key: '' #TODO: set this to let railsapp::backup put backups in s3
+
 # For other options look into cookbooks/*/attributes/default.rb
 # and other cookbook sources.
 
@@ -36,6 +40,7 @@ set :run_list, %w(
   recipe[postgresql]
   recipe[nginx]
   recipe[railsapp]
+  recipe[railsapp::backup]
 )
   
 after 'deploy:restart', 'deploy:restart_unicorn'
