@@ -13,7 +13,9 @@ set :default_stage, :vagrant
 # by default.
 # Change to specific version in ruby-build format
 # if exact version needed.
-set :ruby_version, :brightbox
+#valid brightbox "1.9.3" and "2.0"
+set :ruby_version, "2.0"
+set :ruby_source, :brightbox
 set :care_about_ruby_version, false
 
 set :postgresql,
