@@ -128,7 +128,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Open SSH connection to server"
     task :ssh do
-      host = roles[:app].servers.first # silly approach
+      host = find_servers.first
       exec "ssh #{ssh_login_options} #{fetch(:user)}@#{host}"
     end
     
@@ -138,14 +138,14 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc 'Run rails console'
     task :console do
-      host = roles[:app].servers.first # silly approach
+      host = find_servers.first
       cmd = "cd #{current_path} && #{sudo_runner} bundle exec rails console #{rails_env}"
       exec "ssh -t #{ssh_login_options} #{fetch(:user)}@#{host} #{cmd.shellescape}"
     end
 
     desc 'Run rake task. Example: cap mana:rake about'
     task :rake do
-      host = roles[:app].servers.first # silly approach
+      host = find_servers.first # todo we could also iterate here?
       args = ARGV.drop_while { |a| a != 'mana:rake' }[1..-1].join ' '
       cmd = "cd #{current_path} && #{sudo_runner} RAILS_ENV=#{rails_env} bundle exec rake #{args}"
       exec "ssh #{fetch(:user)}@#{host} #{cmd.shellescape}"
