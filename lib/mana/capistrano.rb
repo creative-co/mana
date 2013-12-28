@@ -23,6 +23,9 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   set :strategy, RemoteCacheSubdir.new(self)
 
+  set :show_beautiful_deer, true
+  set :ask_confirmation, true
+
   # Roundsman fine-tuning
 
   set :chef_version, '~> 11.4.0'
@@ -163,6 +166,40 @@ Capistrano::Configuration.instance(:must_exist).load do
       end
     end
 
+    namespace :addon do
+      task :beautiful_deer do
+        puts File.read(File.join("config", "deploy", "deer.txt")) if show_beautiful_deer
+      end
+
+      task :confirmation do
+        if ask_confirmation
+          set(:confirmed) do
+            project = "#{application.upcase} (#{stage.upcase})"
+            project = Array.new(((72 - project.length) / 2).ceil, "").join(" ") + project
+
+            puts <<-WARN
+
+        ========================================================================
+        #{project}
+        ========================================================================
+
+          WARNING: You're about to perform actions on application server(s)
+          Please confirm that all your intentions are kind and friendly
+
+        ========================================================================
+
+            WARN
+            answer = Capistrano::CLI.ui.ask "  Are you sure you want to continue? (Y) "
+            if answer == 'Y' then true else false end
+          end
+
+          unless fetch(:confirmed)
+            puts "\nDeploy cancelled!"
+            exit
+          end
+        end
+      end
+    end
   end
 
   # More convinience
@@ -178,4 +215,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       sudo "service #{fetch(:application)}-web restart"
     end
   end
+
+  before 'deploy', 'mana:addon:beautiful_deer'
+  before 'deploy', 'mana:addon:confirmation'
 end

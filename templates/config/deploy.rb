@@ -31,6 +31,15 @@ set :aws,
     access_key_id: '',
     secret_access_key: '' #TODO: set this to let railsapp::backup put backups in s3
 
+
+# Show ASCII beautiful deer in console before deploy.
+# True by default
+#set :show_beautiful_deer, false
+
+# Ask confirmation [Y/N] before deploy. It should be true for production stages.
+# True by default
+#set :ask_confirmation, false
+
 # For other options look into cookbooks/*/attributes/default.rb
 # and other cookbook sources.
 
