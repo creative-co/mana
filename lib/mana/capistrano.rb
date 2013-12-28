@@ -23,7 +23,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   set :strategy, RemoteCacheSubdir.new(self)
 
-  set :show_beautiful_deer, true
+  set :show_mascot, true
   set :ask_confirmation, true
 
   # Roundsman fine-tuning
@@ -167,8 +167,13 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     namespace :addon do
-      task :beautiful_deer do
-        puts File.read(File.join("config", "deploy", "deer.txt")) if show_beautiful_deer
+      task :mascot do
+        file = File.join("config", "deploy", "mascot.txt")
+
+        if File.exist?(file) && show_mascot
+          puts File.read(file)
+        end
+
       end
 
       task :confirmation do
@@ -216,6 +221,6 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
   end
 
-  before 'deploy', 'mana:addon:beautiful_deer'
+  before 'deploy', 'mana:addon:mascot'
   before 'deploy', 'mana:addon:confirmation'
 end
