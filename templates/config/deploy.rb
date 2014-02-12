@@ -50,6 +50,7 @@ set :run_list, %w(
   recipe[nginx]
   recipe[railsapp]
   recipe[railsapp::backup]
+  recipe[ubuntu]
 )
   
 after 'deploy:restart', 'deploy:restart_unicorn'
