@@ -32,12 +32,14 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :cookbooks_directory, 'config/deploy/cookbooks'
   set :stream_roundsman_output, false # todo check why is this needed
   set :ruby_install_script do
-    if fetch(:ruby_version) == :brightbox
+    if fetch(:ruby_source) == :brightbox
+      #pg for brightbox ruby2.0   requires headers
       %Q{
         apt-get install -y python-software-properties
         apt-add-repository -y ppa:brightbox/ruby-ng
         apt-get update
-        apt-get install -y ruby1.9.3
+        apt-get install -y ruby#{fetch(:ruby_version) == "2.0" ? "#{fetch(:ruby_version)} ruby2.0-dev": fetch(:ruby_version)}
+
         gem install bundler
       }
     else
@@ -61,7 +63,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         return true
       end
 
-      return false if fetch(:ruby_version) == :brightbox
+      return false if fetch(:ruby_source) == :brightbox
 
       required_version = fetch(:ruby_version).gsub("-", "")
       if installed_version.include?(required_version)
