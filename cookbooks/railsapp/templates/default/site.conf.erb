@@ -24,12 +24,13 @@ server {
     }
   }
 
-  location ~* \.(js|css|png|jpg|gif)$ {
-    if ($query_string ~ "^[0-9]+$") {
-      access_log off;
-      expires max;
-      add_header Cache-Control public;
-    }
+  location ~ ^/(assets)/  {
+    gzip_static on;
+    access_log off;
+    expires max;
+    add_header Cache-Control public;
+    add_header Last-Modified "";
+    add_header ETag "";
   }
 }
 
@@ -46,13 +47,13 @@ server {
   proxy_set_header  X-FORWARDED_PROTO https;
 
   root <%= node[:current_path] %>/public;
-  
+
   location / {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header Host $http_host;
     proxy_redirect off;
     proxy_read_timeout <%= node[:railsapp][:request_timeout] %>s;
-    
+
     # If you don't find the filename in the static files
     # Then request it from the unicorn server
     if (!-f $request_filename) {
