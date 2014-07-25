@@ -159,7 +159,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc "Watch Rails log"
     task :watchlog do
       begin
-        run "tail -n 100 -f #{fetch(:shared_path)}/log/#{rails_env}.log", pty: true do |_, stream, data|
+        run "tail -n 100 -f #{fetch(:shared_path)}/log/#{rails_env}.log", pty: true do |channel, stream, data|
           puts "[#{channel[:host]}][#{Time.now.strftime('%Y-%m-%d %H:%M:%S')}] #{data}"
           break if stream == :err
         end
